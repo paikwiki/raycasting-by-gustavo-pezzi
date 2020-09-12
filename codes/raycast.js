@@ -10,6 +10,7 @@ const FOV_ANGLE = 60 * (Math.PI / 180);
 const WALL_STRIP_WIDTH = 1;
 const NUM_RAYS = WINDOW_WIDTH / WALL_STRIP_WIDTH;
 
+const MINIMAP_SCALE_FACTOR = 1.0 // Fixing the Intersection Offset Error 챕터에서 갑자기 등장한 변수?
 class Map {
   constructor() {
     this.grid = [
@@ -74,15 +75,15 @@ class Player {
   }
   render() {
     noStroke();
-    fill("red");
+    fill("blue");
     circle(this.x, this.y, this.radius);
-    // stroke("red");
-    // line(
-    //   this.x,
-    //   this.y,
-    //   this.x + Math.cos(this.rotationAngle) * 30,
-    //   this.y + Math.sin(this.rotationAngle) * 30
-    // );
+    stroke("blue");
+    line(
+      this.x,
+      this.y,
+      this.x + Math.cos(this.rotationAngle) * 30,
+      this.y + Math.sin(this.rotationAngle) * 30
+    );
   }
 }
 
@@ -129,16 +130,12 @@ class Ray {
     var nextHorzTouchX = xintercept;
     var nextHorzTouchY = yintercept;
 
-    if (this.isRayFacingUp)
-      nextHorzTouchY--;
-
     // increment xstep and ystep until we find a wall
     while (nextHorzTouchX >= 0 && nextHorzTouchX <= WINDOW_WIDTH && nextHorzTouchY > 0 && nextHorzTouchY <= WINDOW_HEIGHT) {
-      if (grid.hasWallAt(nextHorzTouchX, nextHorzTouchY)) {
+      if (grid.hasWallAt(nextHorzTouchX, nextHorzTouchY - (this.isRayFacingUp ? 1 : 0))) {
         foundHorzWallHit = true;
         horzWallHitX = nextHorzTouchX;
         horzWallHitY = nextHorzTouchY;
-
         break;
       } else {
         nextHorzTouchX += xstep;
@@ -171,12 +168,9 @@ class Ray {
     var nextVertTouchX = xintercept;
     var nextVertTouchY = yintercept;
 
-    if (this.isRayFacingLeft)
-      nextVertTouchX--;
-
     // increment xstep and ystep until we find a wall
     while (nextVertTouchX >= 0 && nextVertTouchX <= WINDOW_WIDTH && nextVertTouchY > 0 && nextVertTouchY <= WINDOW_HEIGHT) {
-      if (grid.hasWallAt(nextVertTouchX, nextVertTouchY)) {
+      if (grid.hasWallAt(nextVertTouchX - (this.isRayFacingLeft ? 1 : 0), nextVertTouchY)) {
         foundVertWallHit = true;
         vertWallHitX = nextVertTouchX;
         vertWallHitY = nextVertTouchY;
