@@ -117,7 +117,7 @@ class Ray {
 
     // calculate the increment xstep and ystep
     ystep = TILE_SIZE;
-    ystep *= this.isRayFacingDown ? -1 : 1;
+    ystep *= this.isRayFacingUp ? -1 : 1;
 
     xstep = TILE_SIZE / Math.tan(this.rayAngle);
     xstep *= (this.isRayFacingLeft && xstep > 0) ? -1 : 1;
