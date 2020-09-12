@@ -17,8 +17,8 @@ class Map {
     this.grid = [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-      [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-      [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+      [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+      [1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1],
       [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -58,7 +58,7 @@ class Map {
 class Player {
   constructor() {
     this.x = WINDOW_WIDTH / 2;
-    this.y = WINDOW_HEIGHT / 2;
+    this.y = TILE_SIZE + (TILE_SIZE / 2);
     this.radius = 3;
     this.turnDirection = 0;  // -1 if left, +1 if right
     this.walkDirection = 0;  // -1 if back, +1 if front
@@ -261,6 +261,29 @@ function castAllRays() {
   }
 }
 
+function render3DProjectedWalls() {
+  // loop every ray in the array of rays
+  for (var i = 0; i < NUM_RAYS; i++) {
+    var ray = rays[i];
+
+    var rayDistance = ray.distance;
+
+    // calculate the distance to the projection
+    var distanceProjectionPlane = (WINDOW_WIDTH / 2) / Math.tan(FOV_ANGLE / 2);
+
+    // projected wall height
+    var wallStripHeight = (TILE_SIZE / rayDistance) * distanceProjectionPlane;
+    fill("rgba(255, 255, 255, 1.0)");
+    noStroke();
+    rect(
+      i * WALL_STRIP_WIDTH,
+      (WINDOW_HEIGHT / 2) - (wallStripHeight / 2),
+      WALL_STRIP_WIDTH,
+      wallStripHeight
+    );
+  }
+}
+
 function normalizeAngle(angle) {
   angle = angle % (2 * Math.PI);
   if (angle < 0) {
@@ -283,7 +306,10 @@ function update() {
 }
 
 function draw() {
+  clear("#212121");
   update();
+
+  render3DProjectedWalls();
 
   grid.render();
   for (ray of rays) {
